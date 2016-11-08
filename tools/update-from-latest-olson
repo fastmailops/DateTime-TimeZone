@@ -34,7 +34,7 @@ sub main {
         ($olson_version) = $dir =~ m{/([^/]+)$};
     }
 
-    _compile_tzdata($dir);
+    _install_tzdata($dir);
     _parse_olson( $dir, $olson_version, $opts{tests} );
 }
 
@@ -92,7 +92,7 @@ sub _download {
     return $olson_version;
 }
 
-sub _compile_tzdata {
+sub _install_tzdata {
     my $dir = shift;
 
     my $pushed = pushd($dir);
@@ -100,45 +100,8 @@ sub _compile_tzdata {
     # The CFLAGS bit is necessary because of an issue introduced in 2017c with
     # the use of snprintf. This works fine on my machine without the flag but
     # blows up on Travis.
-    system( 'make', 'CFLAGS=-DHAVE_SNPRINTF' )
+    system( 'make', 'install', 'CFLAGS=-DHAVE_SNPRINTF' )
         and die "Cannot run make: $!";
-
-    my $target = $dir->subdir('target');
-    $target->mkpath( 0, 0755 );
-
-    my @files = qw(
-        africa
-        antarctica
-        asia
-        australasia
-        europe
-        northamerica
-        southamerica
-        etcetera
-        factory
-        backward
-    );
-
-    for my $f (@files) {
-        system( './zic', '-d', $target, $f )
-            and die "Cannot run zic on $f";
-    }
-
-    # The rdfind and symlinks bits are copied from the Debian tzdata packages
-    # rules file.
-    system(
-        'rdfind',
-        '-outputname',       '/dev/null',
-        '-makesymlinks',     'true',
-        '-removeidentinode', 'false',
-        $target
-    );
-
-    system( qw( symlinks -r -s -c ), $target );
-
-    system(qw( sudo rm -fr /usr/share/zoneinfo ));
-    system( qw( sudo mv ), $target, '/usr/share/zoneinfo' );
-    system(qw( sudo chown -R root:root /usr/share/zoneinfo ));
 }
 
 sub _parse_olson {
@@ -156,8 +119,10 @@ sub _parse_olson {
 
     if ($generate_tests) {
         print "Generating tests from zdump\n";
-        system('./tools/tests_from_zdump')
-            and die "Cannot run tests_from_zdump: $!";
+        system(
+          './tools/tests_from_zdump',
+          '--zdump', '/usr/local/etc/zdump',
+        ) and die "Cannot run tests_from_zdump: $!";
     }
 }
 
