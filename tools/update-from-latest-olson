@@ -148,6 +148,7 @@ sub _parse_olson {
 
     system(
         './tools/parse_olson',
+        '--old',
         '--clean',
         '--version', $olson_version,
         '--dir',     $dir,
