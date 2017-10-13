@@ -100,7 +100,7 @@ sub _install_tzdata {
     # The CFLAGS bit is necessary because of an issue introduced in 2017c with
     # the use of snprintf. This works fine on my machine without the flag but
     # blows up on Travis.
-    system( 'make', 'install', 'CFLAGS=-DHAVE_SNPRINTF' )
+    system( 'make', 'install', 'CFLAGS=-DHAVE_SNPRINTF', "TOPDIR=$dir/usr" )
         and die "Cannot run make: $!";
 }
 
@@ -121,7 +121,7 @@ sub _parse_olson {
         print "Generating tests from zdump\n";
         system(
           './tools/tests_from_zdump',
-          '--zdump', '/usr/local/etc/zdump',
+          '--zdump', "$dir/usr/usr/bin/zdump",
         ) and die "Cannot run tests_from_zdump: $!";
     }
 }
