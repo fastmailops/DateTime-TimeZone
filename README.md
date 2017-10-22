@@ -330,6 +330,7 @@ Dave Rolsky <autarch@urth.org>
 - Mohammad S Anwar <mohammad.anwar@yahoo.com>
 - Olaf Alders <olaf@wundersolutions.com>
 - Peter Rabbitson <ribasushi@cpan.org>
+- Rob N ★ <robn@robn.io>
 - Tom Wyant <wyant@cpan.org>
 
 # COPYRIGHT AND LICENSE
